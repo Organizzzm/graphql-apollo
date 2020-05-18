@@ -15,7 +15,7 @@ interface allPetsData {
 
 export const useQueryAllPets = () => {
   const { loading, error, data } = useQuery<allPetsData, null>(queryAllPets);
-  const pets = data?.allPets;
+  const pets = data ? data.allPets : null;
 
   return { loading, error, pets };
 };
