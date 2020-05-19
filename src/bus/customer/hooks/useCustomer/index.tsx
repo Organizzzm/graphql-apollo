@@ -1,17 +1,14 @@
 import { useMutation } from "@apollo/react-hooks";
 import { loader } from "graphql.macro";
-import { useState, ChangeEvent, SyntheticEvent } from "react";
+import { ChangeEvent } from "react";
+import { ICustomerState } from "../useForm";
 
 const mutationCreateAccount = loader("./gql/mutationCreateAccount.gql");
 
-interface IAccount {
+export interface IAccount {
   name: string;
   username: string;
   password: string;
-}
-
-interface ICustomerState {
-  account: IAccount;
 }
 
 interface ICustomerResponseData {
@@ -21,8 +18,7 @@ interface ICustomerResponseData {
 }
 
 interface IHandlersAndResponseData {
-  handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
-  save: (e: SyntheticEvent) => void;
+  save: (e: ChangeEvent<HTMLFormElement>) => void;
   createdAccount:
     | {
         name: string;
@@ -30,30 +26,14 @@ interface IHandlersAndResponseData {
     | undefined;
 }
 
-export const useCustomer = (): IHandlersAndResponseData => {
+export const useCustomer = (
+  values: ICustomerState
+): IHandlersAndResponseData => {
   const [addUser, { data }] = useMutation<ICustomerResponseData>(
     mutationCreateAccount
   );
-  const [values, setValues] = useState<ICustomerState>({
-    account: {
-      name: "",
-      username: "",
-      password: "",
-    },
-  });
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    event.persist();
-
-    setValues((prevState: ICustomerState) => ({
-      account: {
-        ...prevState.account,
-        [event.target.name]: event.target.value,
-      },
-    }));
-  };
-
-  const save = (e: SyntheticEvent): void => {
+  const save = (e: ChangeEvent<HTMLFormElement>): void => {
     e.preventDefault();
     const { account } = values;
 
@@ -62,7 +42,9 @@ export const useCustomer = (): IHandlersAndResponseData => {
         account,
       },
     });
+
+    e.target.reset();
   };
 
-  return { handleChange, save, createdAccount: data?.createAccount };
+  return { save, createdAccount: data?.createAccount };
 };

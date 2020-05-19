@@ -1,13 +1,21 @@
 import React, { FC } from "react";
 import { useCustomer } from "./hooks/useCustomer";
+import { useForm, ICustomerState } from "./hooks/useForm";
 
 export const Customer: FC = () => {
-  const { handleChange, save, createdAccount } = useCustomer();
+  const { handleChange, values } = useForm<ICustomerState>({
+    account: {
+      name: "",
+      username: "",
+      password: "",
+    },
+  });
+  const { save, createdAccount } = useCustomer(values);
 
   return (
     <>
       <h1>Customer - {createdAccount?.name}</h1>
-      <form>
+      <form onSubmit={save}>
         <input
           type="text"
           placeholder="name"
@@ -26,9 +34,7 @@ export const Customer: FC = () => {
           name="password"
           onChange={handleChange}
         />
-        <button type="submit" onClick={save}>
-          Save
-        </button>
+        <button type="submit">Save</button>
       </form>
     </>
   );
